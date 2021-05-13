@@ -5,24 +5,21 @@
 #include <stdio.h>
 #include <SDL_ttf.h>
 #include <chrono>
-#include <thread>
 #include <string>
 
 //the height and width of the window, const cuz they'll never change
 const int Win_Height = 720;
 const int Win_Width = 1280;
 
-const int SCREEN_FPS = 60;
 
 const int Ball_Width = 20;
 const int Ball_Height = 20;
 
 const int Paddle_Height = 75;
 const int Paddle_Width = 12;
-const float Paddle_Speed = 20.0f;
-const float Ball_Speed = 20.0f;
+const float Paddle_Speed = 0.5f;
+const float Ball_Speed = 0.5f;
 
-SDL_Surface* gScreenSurface = NULL;
 
 //this declares the key presses and assigns
 //automatically a constant to them, so default is 0, up is 1, down is 2 etc
@@ -125,13 +122,13 @@ public:
 			velocity.y = -velocity.y;
 		}
 		else if (contact.type == CollisionType::Left) {
-			position.x = Win_Width / 2.0f;
+			position.x = Win_Width / 10.0f;
 			position.y = Win_Height / 2.0f;
 			velocity.x = Ball_Speed;
 			velocity.y = 0.75 * Ball_Speed;
 		}
 		else if (contact.type == CollisionType::Right) {
-			position.x = Win_Width / 2.0f;
+			position.x = Win_Width / 1.1 ;
 			position.y = Win_Height / 2.0f;
 			velocity.x = -Ball_Speed;
 			velocity.y = 0.75 * Ball_Speed;
@@ -145,6 +142,7 @@ public:
 		rect.y = static_cast<int>(position.y);
 
 		SDL_RenderFillRect(renderer, &rect);
+
 	}
 };
 
@@ -180,12 +178,12 @@ public:
 	//draw the rect, with the renderer at the specified positions
 	void Draw(SDL_Renderer* renderer) {
 		rect.y = static_cast<int>(position.y);
-	//	SDL_Surface* image = IMG_Load("Bottom.png");
-	//	SDL_Texture* loadedSurface = SDL_CreateTextureFromSurface(renderer, image);
-	//	SDL_RenderCopy(renderer, loadedSurface, nullptr, &rect);
-		SDL_RenderFillRect(renderer, &rect);
-//		SDL_DestroyTexture(loadedSurface);
-//		SDL_FreeSurface(image);
+		SDL_Surface* image = IMG_Load("Bottom.png");
+		SDL_Texture* loadedSurface = SDL_CreateTextureFromSurface(renderer, image);
+		SDL_RenderCopy(renderer, loadedSurface, nullptr, &rect);
+		//	SDL_RenderFillRect(renderer, &rect);
+		SDL_DestroyTexture(loadedSurface);
+		SDL_FreeSurface(image);
 	}
 };
 
@@ -334,17 +332,6 @@ Contact WallCollision(Ball const& ball) {
 	return contact;
 }
 
-struct thread_data {
-
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	TTF_Font* scoreFont;
-	Ball ball;
-	Paddle P1;
-	Paddle P2;
-	Score P1ScoreText;
-	Score P2ScoreText;
-};
 
 
 
@@ -360,7 +347,7 @@ int main(int argc, char* args[]) {
 
 
 	//SDL window, the place where we shall do all the things.
-	SDL_Window* window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Win_Width, Win_Height, SDL_WINDOW_SHOWN);
+	SDL_Window* window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Win_Width, Win_Height, SDL_WINDOW_SHOWN); //window centered
 	//SDL renderer, the thing with which we shall do all the things
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 	//Font
@@ -387,15 +374,15 @@ int main(int argc, char* args[]) {
 	bool running = true;
 	bool buttons[4] = {};
 
-	
+
 
 	while (running) {
 		//two different timers live here
 		//one for fps limiter, another for tracking the time between the frames
-	//	auto startTime = std::chrono::high_resolution_clock::now();
+		auto startTime = std::chrono::high_resolution_clock::now();
 		//event stack, gonna keep track of keeb and mouse interaction
 		SDL_Event event;
-		Uint64 start = SDL_GetPerformanceCounter();
+		//Uint64 start = SDL_GetPerformanceCounter();
 		//while we have not run out of events
 
 
@@ -503,8 +490,7 @@ int main(int argc, char* args[]) {
 		}
 
 
-		//framerate limiter to 60fps
-		Uint64 end = SDL_GetPerformanceCounter();
+
 		//	auto stopTime = std::chrono::high_resolution_clock::now();
 
 		//	float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
@@ -512,7 +498,7 @@ int main(int argc, char* args[]) {
 			//clear the window to black
 		SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0x0);
 		SDL_RenderClear(renderer);
-		//drawing the net. 
+		//drawing the net
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF); //set draw color to white
 
 		for (int y = 0; y < Win_Height; ++y) {
@@ -522,9 +508,9 @@ int main(int argc, char* args[]) {
 
 		}
 		//draw the ball, paddle, score.
-		//SDL_Surface* image = IMG_Load("Screen.png");
-		//SDL_Texture* loadedSurface = SDL_CreateTextureFromSurface(renderer, image);
-		//SDL_RenderCopy(renderer, loadedSurface, nullptr, NULL);
+		SDL_Surface* image = IMG_Load("Screen.png");
+		SDL_Texture* loadedSurface = SDL_CreateTextureFromSurface(renderer, image);
+		SDL_RenderCopy(renderer, loadedSurface, nullptr, NULL);
 		//SDL_RenderFillRect(renderer, &rect);
 
 		ball.Draw(renderer);
@@ -533,12 +519,12 @@ int main(int argc, char* args[]) {
 		P1ScoreText.Draw();
 		P2ScoreText.Draw();
 		SDL_RenderPresent(renderer);
-	//	SDL_DestroyTexture(loadedSurface);
-	//	SDL_FreeSurface(image);
+		SDL_DestroyTexture(loadedSurface);
+		SDL_FreeSurface(image);
 
-
-		//dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
-		dt = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+		auto stopTime = std::chrono::high_resolution_clock::now();
+		dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
+		//dt = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
 	}
 
 	SDL_DestroyRenderer(renderer);
