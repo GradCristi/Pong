@@ -15,7 +15,7 @@ const int Win_Width = 1280;
 const int Ball_Width = 20;
 const int Ball_Height = 20;
 
-const int Paddle_Height = 75;
+const int Paddle_Height = 100;
 const int Paddle_Width = 12;
 const float Paddle_Speed = 0.5f;
 const float Ball_Speed = 0.5f;
@@ -99,11 +99,12 @@ public:
 
 	}
 
-	void CollideWithPaddle(Contact const& contact) {
+	void CollideWithPaddle(Contact const& contact, float *counter) {
 		//makes sure the ball never penetrates the actual paddle
 		position.x += contact.penetration;
 		//reverse the velocity
-		velocity.x = -velocity.x;
+		velocity.x = -velocity.x* *counter;
+		*counter+= 0.005;
 
 		if (contact.type == CollisionType::Top) {
 			velocity.y = -0.75f * Ball_Speed;
@@ -225,6 +226,7 @@ public:
 		SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
 		rect.w = width;
 		rect.h = height;
+
 	}
 
 	//frees the memory
@@ -363,8 +365,6 @@ int main(int argc, char* args[]) {
 	Score P1ScoreText(VCT(Win_Width / 4, 20), renderer, scoreFont);
 	Score P2ScoreText(VCT(3 * Win_Width / 4, 20), renderer, scoreFont);
 
-
-
 	float dt = 0.0f;
 	//code is running at this time
 
@@ -374,6 +374,9 @@ int main(int argc, char* args[]) {
 	bool running = true;
 	bool buttons[4] = {};
 
+	float i = 1.0;
+	float *counter= &i;
+	
 
 
 	while (running) {
@@ -469,12 +472,16 @@ int main(int argc, char* args[]) {
 
 		ball.Update(dt);
 
+	
 
 		if (Contact contact = PaddleCollision(ball, P1); contact.type != CollisionType::None) {
-			ball.CollideWithPaddle(contact);
+			ball.CollideWithPaddle(contact, counter);
+			printf("%f \n", *counter);
 		}
 		else if (contact = PaddleCollision(ball, P2);  contact.type != CollisionType::None) {
-			ball.CollideWithPaddle(contact);
+			ball.CollideWithPaddle(contact, counter);
+			printf("%f \n", *counter);
+
 		}
 		else if (contact = WallCollision(ball); contact.type != CollisionType::None) {
 			ball.CollideWithWall(contact);
@@ -482,10 +489,12 @@ int main(int argc, char* args[]) {
 			if (contact.type == CollisionType::Left) {
 				++P2Score;
 				P2ScoreText.SetScore(P2Score);
+				*counter = 1;
 			}
 			else if (contact.type == CollisionType::Right) {
 				++P1Score;
 				P1ScoreText.SetScore(P1Score);
+				*counter = 1;
 			}
 		}
 
