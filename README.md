@@ -1,3 +1,4 @@
+![PongGame](https://user-images.githubusercontent.com/76965165/118996836-e0084680-b990-11eb-9e7f-8b85d69e9462.png)
 # **Pong: An original take on a timeless classic**
 
 ## Cristian Gradinaru 
@@ -34,12 +35,9 @@ Some additional functions are present in this class, such as those that deal wit
 
 The `score` was a bit tricky, as i had to import a font first( and also look for a non copyrighted one, because u never know). So after that is done, we need to create a class called `Score`. Within this class we establish the font( the one we imported) the color and we create a texture out of it. Inside this class we also have a `SetScore` method, which allows us to increment the scoreline( we will see how this is used within the main function). We have to be careful each time we create a texture or surface, to destroy it later, otherwise we create a sort of `memory leak` scenario, which can lead to big problems down the line.
 
-<p float= "left">
+![Performance-abnormal](https://user-images.githubusercontent.com/76965165/118996973-f7dfca80-b990-11eb-94c4-65ac23d24f6f.png)
+![performance-normal](https://user-images.githubusercontent.com/76965165/118996979-f910f780-b990-11eb-9241-83d653689460.png)
 
- <img src="Performance-abnormal.png" height="250">
- <img src="Performance-normal.png" height="250" width= 350>
-
-</p>
 
 ### **Movement**
 
@@ -113,11 +111,14 @@ As we did for each of the other sections beforehand, the first step is to define
  After all the keyboard inputs have been dealt with, its time to deal with collisions, we must call the appropriate functions for each of the possible collisions of the `ball`: with the `paddles` or with the walls, and increment the scoreline if the situation for hitting left or right walls have been met.
 
  Last but not least we have the graphics, The `paddles`, the `ball` and the backgound are all dealt with in the following section. All three (the background and the two `paddles`) work with a texturised image that is being imported from the file in which the app resides. After all these operations are over, we can safely stop the timer (to count the elapsed time between when we started and now) and destroy all remaining textures, windows and renderers that will no longer be used after the termination of the program.
-  <img src="PongGame.png" width="1080">
+ 
+![PongGame](https://user-images.githubusercontent.com/76965165/118996889-e7c7eb00-b990-11eb-8a38-d0b38b0e91b6.png)
+
 
  As far as the speed acceleration I mentioned at the start, it is dealt with in the `CollideWithPaddle` section, by multiplying the x velocity of the `ball` with a counter, which increases by a little bit each time a `paddle` hits the `ball`, and which resets after a player has scored. This has been counted to 29 hits before the game engine no longer is able to deal with the utter speed of everything that is happening, but luckly during testing, no games were able to realistically reach such a hit number.
 
-  <img src="counter.png" width="200">
+![Counter](https://user-images.githubusercontent.com/76965165/118996903-eb5b7200-b990-11eb-9d43-cbdf40fd9538.png)
+
 
 
 The source code itself has a bit more comments about what each of the variables mean, because i couldn't realistically cover absolutely everything here without making this document the size of a small child.
